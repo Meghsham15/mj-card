@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import './App.css';
 
 const PROFILE = {
@@ -21,13 +21,20 @@ const PROFILE = {
     'AI APIs',
     'Web3 / ICP',
   ],
+  keywords: [
+    'Full Stack Developer',
+    'React.js Developer',
+    'Next.js Developer',
+    'Node.js Developer',
+    'AI Developer',
+  ],
 };
 
 const THEMES = [
   {
     id: 'imperial',
     name: 'Imperial',
-    hint: 'Sapphire & Champagne',
+    hint: 'Royal Purple & Gold',
   },
   {
     id: 'regency',
@@ -95,6 +102,7 @@ function buildVCard() {
     `URL:${PROFILE.github}`,
     `URL:${PROFILE.linkedin}`,
     'ADR;TYPE=HOME:;;Pune;Maharashtra;;India',
+    'NOTE:React.js Developer · Next.js Developer · Full Stack Developer',
     'END:VCARD',
   ].join('\r\n');
 }
@@ -103,6 +111,7 @@ function App() {
   const [theme, setTheme] = useState('imperial');
   const [toast, setToast] = useState('');
   const [avatarFailed, setAvatarFailed] = useState(false);
+  const cardRef = useRef(null);
 
   const actions = useMemo(
     () => [
@@ -120,6 +129,40 @@ function App() {
     ],
     []
   );
+
+  useEffect(() => {
+    const card = cardRef.current;
+    if (!card) return undefined;
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) return undefined;
+
+    function onMove(event) {
+      const rect = card.getBoundingClientRect();
+      const x = (event.clientX - rect.left) / rect.width;
+      const y = (event.clientY - rect.top) / rect.height;
+      const tiltX = (0.5 - y) * 8;
+      const tiltY = (x - 0.5) * 10;
+      card.style.setProperty('--tilt-x', `${tiltX.toFixed(2)}deg`);
+      card.style.setProperty('--tilt-y', `${tiltY.toFixed(2)}deg`);
+      card.style.setProperty('--shine-x', `${(x * 100).toFixed(1)}%`);
+      card.style.setProperty('--shine-y', `${(y * 100).toFixed(1)}%`);
+    }
+
+    function onLeave() {
+      card.style.setProperty('--tilt-x', '0deg');
+      card.style.setProperty('--tilt-y', '0deg');
+      card.style.setProperty('--shine-x', '50%');
+      card.style.setProperty('--shine-y', '0%');
+    }
+
+    card.addEventListener('pointermove', onMove);
+    card.addEventListener('pointerleave', onLeave);
+    return () => {
+      card.removeEventListener('pointermove', onMove);
+      card.removeEventListener('pointerleave', onLeave);
+    };
+  }, []);
 
   function showToast(message) {
     setToast(message);
@@ -141,8 +184,8 @@ function App() {
 
   async function shareCard() {
     const payload = {
-      title: 'Meghsham Jade',
-      text: 'Full Stack & AI Developer — digital visiting card',
+      title: 'Meghsham Jade — Full Stack Developer',
+      text: 'Full Stack & AI Developer · React.js · Next.js · digital visiting card',
       url: window.location.href,
     };
 
@@ -168,6 +211,12 @@ function App() {
       <div className="atmosphere" aria-hidden="true">
         <span className="glow glow-a" />
         <span className="glow glow-b" />
+        <span className="glow glow-c" />
+        <span className="spark spark-1" />
+        <span className="spark spark-2" />
+        <span className="spark spark-3" />
+        <span className="spark spark-4" />
+        <span className="vignette" />
         <span className="watermark">MJ</span>
       </div>
 
@@ -190,15 +239,25 @@ function App() {
         </div>
       </header>
 
-      <main className="card" aria-label="Digital visiting card">
+      <main
+        ref={cardRef}
+        className="card"
+        aria-label="Meghsham Jade digital visiting card"
+        itemScope
+        itemType="https://schema.org/Person"
+      >
         <div className="card-edge" aria-hidden="true" />
+        <div className="card-frame" aria-hidden="true" />
+        <div className="card-shine" aria-hidden="true" />
         <span className="corner corner-tl" aria-hidden="true" />
         <span className="corner corner-tr" aria-hidden="true" />
         <span className="corner corner-bl" aria-hidden="true" />
         <span className="corner corner-br" aria-hidden="true" />
 
         <section className="identity">
+          <p className="crest">House of Jade</p>
           <div className="portrait-ring">
+            <span className="portrait-orbit" aria-hidden="true" />
             {avatarFailed ? (
               <div className="monogram" aria-hidden="true">
                 MJ
@@ -206,18 +265,38 @@ function App() {
             ) : (
               <img
                 src={PROFILE.portrait}
-                alt={PROFILE.name}
+                alt="Meghsham Jade — Full Stack and AI Developer portrait"
                 className="portrait"
+                itemProp="image"
+                width="120"
+                height="120"
                 onError={() => setAvatarFailed(true)}
               />
             )}
           </div>
-          <h1>{PROFILE.name}</h1>
-          <p className="title">{PROFILE.title}</p>
-          <p className="location">
-            <Icon name="pin" />
-            {PROFILE.location}
+
+          <h1 className="royal-name" itemProp="name">
+            <span className="royal-name-foil">{PROFILE.name}</span>
+          </h1>
+
+          <p className="title" itemProp="jobTitle">
+            {PROFILE.title}
           </p>
+          <p className="motto">Code · Craft · Intelligence</p>
+          <p className="location" itemProp="address" itemScope itemType="https://schema.org/PostalAddress">
+            <Icon name="pin" />
+            <span itemProp="addressLocality">Pune</span>
+            <span>, </span>
+            <span itemProp="addressRegion">Maharashtra</span>
+            <span>, </span>
+            <span itemProp="addressCountry">India</span>
+          </p>
+
+          <ul className="keyword-row" aria-label="Professional focus">
+            {PROFILE.keywords.map((keyword) => (
+              <li key={keyword}>{keyword}</li>
+            ))}
+          </ul>
         </section>
 
         <div className="actions">
@@ -229,7 +308,9 @@ function App() {
               target={action.external ? '_blank' : undefined}
               rel={action.external ? 'noopener noreferrer' : undefined}
             >
-              <Icon name={action.icon} />
+              <span className="action-icon">
+                <Icon name={action.icon} />
+              </span>
               <span>{action.label}</span>
             </a>
           ))}
@@ -246,26 +327,53 @@ function App() {
           </button>
         </div>
 
-        <section className="expertise" aria-label="Expertise">
+        <section className="expertise" aria-label="Technical expertise">
           <div className="rule">
+            <span className="rule-gem" aria-hidden="true" />
             <span>Expertise</span>
+            <span className="rule-gem" aria-hidden="true" />
           </div>
           <ul>
             {PROFILE.skills.map((skill) => (
-              <li key={skill}>{skill}</li>
+              <li key={skill} itemProp="knowsAbout">
+                {skill}
+              </li>
             ))}
           </ul>
         </section>
 
+        <section className="about" aria-labelledby="about-heading">
+          <div className="rule">
+            <span className="rule-gem" aria-hidden="true" />
+            <span id="about-heading">About</span>
+            <span className="rule-gem" aria-hidden="true" />
+          </div>
+          <p itemProp="description">
+            <strong>Meghsham Jade</strong> is a <strong>Full Stack Developer</strong> and{' '}
+            <strong>AI Developer</strong> based in Pune. As a <strong>React.js developer</strong> and{' '}
+            <strong>Next.js developer</strong>, he builds polished product experiences with Node.js,
+            TypeScript, WebSockets, AI APIs, and Web3 / ICP — from landing pages to realtime systems.
+          </p>
+          <meta itemProp="email" content={PROFILE.email} />
+          <meta itemProp="telephone" content={PROFILE.phone} />
+          <link itemProp="url" href="https://meghsham15.github.io/mj-card/" />
+          <link itemProp="sameAs" href={PROFILE.github} />
+          <link itemProp="sameAs" href={PROFILE.linkedin} />
+          <link itemProp="sameAs" href={PROFILE.portfolio} />
+        </section>
+
         <a
-          className="portfolio"
+          className="portfolio-btn"
           href={PROFILE.portfolio}
           target="_blank"
           rel="noopener noreferrer"
         >
-          Explore portfolio projects
+          <Icon name="globe" />
+          Explore my portfolio
           <Icon name="arrow" />
         </a>
+
+        <p className="serial">MJ · Pune · MMXXVI</p>
       </main>
 
       {toast ? (
