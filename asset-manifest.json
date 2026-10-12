@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/mj-card/static/css/main.7bfcb023.css",
+    "main.js": "/mj-card/static/js/main.d032d68d.js",
+    "index.html": "/mj-card/index.html",
+    "main.7bfcb023.css.map": "/mj-card/static/css/main.7bfcb023.css.map",
+    "main.d032d68d.js.map": "/mj-card/static/js/main.d032d68d.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.7bfcb023.css",
+    "static/js/main.d032d68d.js"
+  ]
+}

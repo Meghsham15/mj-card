@@ -1,0 +1,28 @@
+{
+  "short_name": "Meghsham Jade",
+  "name": "Meghsham Jade | Full Stack Developer Digital Card",
+  "description": "Premium digital visiting card of Meghsham Jade — Full Stack & AI Developer specializing in React.js, Next.js, Node.js, and TypeScript.",
+  "icons": [
+    {
+      "src": "favicon-32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "logo192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "logo512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#12081C",
+  "background_color": "#12081C",
+  "categories": ["business", "productivity"]
+}
