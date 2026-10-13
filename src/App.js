@@ -8,7 +8,13 @@ const PROFILE = {
   email: 'meghshamjade.contact@gmail.com',
   phone: '+919325366493',
   phoneDisplay: '+91 93253 66493',
-  portrait: 'https://avatars.githubusercontent.com/Meghsham15?v=4',
+  portrait: {
+    webp240: `${process.env.PUBLIC_URL}/images/meghsham-jade-full-stack-developer-240.webp`,
+    webp480: `${process.env.PUBLIC_URL}/images/meghsham-jade-full-stack-developer-480.webp`,
+    jpg240: `${process.env.PUBLIC_URL}/images/meghsham-jade-full-stack-developer-240.jpg`,
+    jpg480: `${process.env.PUBLIC_URL}/images/meghsham-jade-full-stack-developer-480.jpg`,
+    alt: 'Meghsham Jade — Full Stack Developer and AI Developer in Pune, professional headshot',
+  },
   portfolio: 'https://meghsham15.github.io/react-portfolio/',
   github: 'https://github.com/Meghsham15',
   linkedin: 'https://www.linkedin.com/in/meghsham-jade-2a3406218/',
@@ -255,7 +261,6 @@ function App() {
         <span className="corner corner-br" aria-hidden="true" />
 
         <section className="identity">
-          <p className="crest">House of Jade</p>
           <div className="portrait-ring">
             <span className="portrait-orbit" aria-hidden="true" />
             {avatarFailed ? (
@@ -263,15 +268,26 @@ function App() {
                 MJ
               </div>
             ) : (
-              <img
-                src={PROFILE.portrait}
-                alt="Meghsham Jade — Full Stack and AI Developer portrait"
-                className="portrait"
-                itemProp="image"
-                width="120"
-                height="120"
-                onError={() => setAvatarFailed(true)}
-              />
+              <picture>
+                <source
+                  type="image/webp"
+                  srcSet={`${PROFILE.portrait.webp240} 240w, ${PROFILE.portrait.webp480} 480w`}
+                  sizes="132px"
+                />
+                <img
+                  src={PROFILE.portrait.jpg240}
+                  srcSet={`${PROFILE.portrait.jpg240} 240w, ${PROFILE.portrait.jpg480} 480w`}
+                  sizes="132px"
+                  alt={PROFILE.portrait.alt}
+                  className="portrait"
+                  itemProp="image"
+                  width="132"
+                  height="132"
+                  decoding="async"
+                  fetchPriority="high"
+                  onError={() => setAvatarFailed(true)}
+                />
+              </picture>
             )}
           </div>
 
