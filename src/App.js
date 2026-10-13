@@ -113,10 +113,22 @@ function buildVCard() {
   ].join('\r\n');
 }
 
+function dismissBootSplash() {
+  const splash = document.getElementById('boot-splash');
+  if (!splash) return;
+
+  splash.classList.add('is-exit');
+  window.setTimeout(() => {
+    splash.remove();
+    document.body.classList.remove('is-booting');
+  }, 750);
+}
+
 function App() {
   const [theme, setTheme] = useState('imperial');
   const [toast, setToast] = useState('');
   const [avatarFailed, setAvatarFailed] = useState(false);
+  const [ready, setReady] = useState(false);
   const cardRef = useRef(null);
 
   const actions = useMemo(
@@ -137,8 +149,42 @@ function App() {
   );
 
   useEffect(() => {
+    document.body.classList.add('is-booting');
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const minDuration = reduceMotion ? 200 : 1600;
+    const startedAt = performance.now();
+    let settled = false;
+
+    function finish() {
+      if (settled) return;
+      settled = true;
+      const elapsed = performance.now() - startedAt;
+      const wait = Math.max(0, minDuration - elapsed);
+      window.setTimeout(() => {
+        setReady(true);
+        dismissBootSplash();
+      }, wait);
+    }
+
+    const portrait = new Image();
+    portrait.decoding = 'async';
+    portrait.onload = finish;
+    portrait.onerror = finish;
+    portrait.src = PROFILE.portrait.webp240;
+
+    const safety = window.setTimeout(finish, reduceMotion ? 500 : 4000);
+
+    return () => {
+      window.clearTimeout(safety);
+      portrait.onload = null;
+      portrait.onerror = null;
+    };
+  }, []);
+
+  useEffect(() => {
     const card = cardRef.current;
-    if (!card) return undefined;
+    if (!card || !ready) return undefined;
 
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduceMotion) return undefined;
@@ -168,7 +214,7 @@ function App() {
       card.removeEventListener('pointermove', onMove);
       card.removeEventListener('pointerleave', onLeave);
     };
-  }, []);
+  }, [ready]);
 
   function showToast(message) {
     setToast(message);
@@ -213,7 +259,7 @@ function App() {
   }
 
   return (
-    <div className="stage" data-theme={theme}>
+    <div className={ready ? 'stage is-ready' : 'stage'} data-theme={theme}>
       <div className="atmosphere" aria-hidden="true">
         <span className="glow glow-a" />
         <span className="glow glow-b" />

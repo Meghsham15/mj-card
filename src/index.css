@@ -26,6 +26,10 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+body.is-booting {
+  overflow: hidden;
+}
+
 button,
 a {
   font-family: inherit;

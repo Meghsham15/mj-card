@@ -28,6 +28,12 @@
   flex-direction: column;
   align-items: center;
   padding: 28px 16px 48px;
+  opacity: 0;
+}
+
+.stage.is-ready {
+  opacity: 1;
+  animation: stage-reveal 0.85s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .stage[data-theme='regency'] {
@@ -968,6 +974,19 @@
   }
 }
 
+@keyframes stage-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.985);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
 @keyframes toast-in {
   from {
     opacity: 0;
@@ -1042,9 +1061,16 @@
   .action,
   .cta,
   .expertise li,
-  .portfolio-btn {
+  .portfolio-btn,
+  .stage.is-ready {
     animation: none;
     transition: none;
+  }
+
+  .stage.is-ready {
+    opacity: 1;
+    filter: none;
+    transform: none;
   }
 
   .card {
